@@ -104,3 +104,11 @@ class Sudoku:  # Code from GeeksforGeeks
             for j in range(self.N):
                 print(self.mat[i][j], end=" ")
             print()
+
+    def getEmptyCells(self):
+        count = 0
+        for i in range(9):
+            for j in range(9):
+                if self.mat[i][j] == 0:
+                    count += 1
+        return count
