@@ -7,7 +7,7 @@ N = 9
 K = 40
 sudoku = Sudoku(N, K)
 sudoku.fillValues()
-gui = GUI(sudoku.mat)
+gui = GUI()
 
 variables_domains = {}
 variables_arc_constraints = {}
