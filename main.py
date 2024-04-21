@@ -1,18 +1,21 @@
+from time import sleep
+
 from gui import GUI
 import queue
 from random_sudoku_generator import Sudoku
 from validator import isValidSudoku
-
+import copy
 N = 9
 K = 40
 sudoku = Sudoku(N, K)
 sudoku.fillValues()
-gui = GUI(sudoku.mat)
+#
 
 variables_domains = {}
 variables_arc_constraints = {}
 variables_that_require_consistency_enforcement = queue.Queue()
-
+for i in range(0,9):
+    print(sudoku.mat[i])
 
 def initialize_variable_domains_and_constraints():
     for i in range(9):
@@ -109,3 +112,108 @@ for key in variables_domains:
 print("///////////////////////")
 for key in variables_arc_constraints:
     print(f"{key}: {variables_arc_constraints[key]}")
+# variables_domains[(1, 5)].remove(5)
+# print((variables_domains[(1, 5)].remove(7)))
+print((variables_domains[(1, 5)]))
+
+def arc_consistency(variables_domains,variables_arc_constraints,matrix):
+    check_oneElement_not_set=[]
+    for i in range(0,9):
+        for j in range(0, 9):
+            if len(variables_domains[(i,j)])==1:
+                value=variables_domains[(i,j)][0]
+                constr=variables_arc_constraints[(i,j)]
+                for k in constr:
+                    if value in variables_domains[k]:
+                        variables_domains[k].remove(value)
+                        if len(variables_domains[k])==1:
+                            check_oneElement_not_set.append((i,j))
+    # print(check_oneElement_not_set)
+
+    # while len(check_oneElement_not_set)!=0:
+    #     i,j=check_oneElement_not_set.pop()
+    #     constr = variables_arc_constraints[(i, j)]
+    #     for k in constr:
+    #         if value in variables_domains[k]:
+    #             variables_domains[k].remove(value)
+    #             if len(variables_domains[k]) == 1:
+    #                 check_oneElement_not_set.append((i, j))
+    # print(check_oneElement_not_set)
+
+    return variables_domains
+def is_compelete(sudoku_mat):
+    for i in range(0, 9):
+        for j in range(0, 9):
+            if sudoku_mat[i][j]==0:
+                return False
+    return True
+def backtracking(variables_domains,variables_arc_constraints,sudoku_mat):
+    modified=0
+    for i in range(0,9):
+        for j in range(0, 9):
+            print(i,j,'....',(variables_domains[(i,j)]),sudoku_mat[i][j])
+            if len(variables_domains[(i, j)]) == 0:
+                return False
+            if len(variables_domains[(i,j)])==1 and sudoku_mat[i][j]==0:
+                sudoku_mat[i][j]=variables_domains[(i,j)][0]
+                arc_consistency(variables_domains, variables_arc_constraints, sudoku_mat)
+                modified+=1
+
+    if modified==0:
+        MRV_Xind=0
+        MRV_Yind=0
+        minnum=10
+        for i in range(0, 9):
+            for j in range(0, 9):
+                if len(variables_domains[(i, j)]) <minnum and 1<minnum:
+                    minnum=len(variables_domains[(i, j)])
+                    MRV_Xind = i
+                    MRV_Yind = j
+        vaules = copy.deepcopy(variables_domains[(MRV_Xind, MRV_Yind)])
+        dm=copy.deepcopy(variables_domains)
+        cst=copy.deepcopy(variables_arc_constraints)
+        mat=copy.deepcopy(sudoku_mat)
+        while len(vaules)!=0:
+            k=vaules.pop(0)
+            variables_domains[(i, j)]=[]
+            variables_domains[(i, j)].append(k)
+            # arc_consistency(variables_domains, variables_arc_constraints, sudoku_mat)
+            if backtracking(variables_domains, variables_arc_constraints, sudoku_mat)==False:
+                variables_domains=dm
+                variables_arc_constraints=cst
+                sudoku_mat=mat
+                continue
+            else:
+                if is_compelete(sudoku_mat):
+                    return sudoku_mat
+                else:
+                    print("tefgayhcdsjcsdmkc")
+                    # backtracking(variables_domains, variables_arc_constraints, sudoku_mat)
+        # variables_domains[(i, j)]=copy.deepcopy(vaules)
+    else:
+        arc_consistency(variables_domains, variables_arc_constraints,sudoku_mat)
+        if is_compelete(sudoku_mat):
+            return sudoku_mat
+        else:
+            for i in range(0,9):
+                print(sudoku_mat[i])
+            sleep(10)
+            return backtracking(variables_domains, variables_arc_constraints, sudoku_mat)
+
+
+
+
+
+
+    arc_consistency(variables_domains,variables_arc_constraints,sudoku_mat)
+    for i in range(0, 9):
+        print(sudoku_mat[i])
+
+n=arc_consistency(variables_domains,variables_arc_constraints,sudoku.mat)
+backtracking(variables_domains,variables_arc_constraints,sudoku.mat)
+# backtracking(variables_domains,variables_arc_constraints,sudoku.mat)
+print(n)
+print(variables_domains)
+
+
+gui = GUI(sudoku.mat)
