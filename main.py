@@ -203,7 +203,7 @@ def backtracking(variables_domains,variables_arc_constraints,sudoku_mat,solution
 
 
             else:
-                solution=k
+                solution=v
 
                 if is_compelete(sudoku_mat):
                     return sudoku_mat,solution
