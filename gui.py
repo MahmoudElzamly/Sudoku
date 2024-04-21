@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import W, SUNKEN, RAISED
 from tkinter.simpledialog import askstring
-
 from random_sudoku_generator import Sudoku
 
 
@@ -53,12 +52,17 @@ class GUI:
         self.canvas.pack()
         self.canvas.bind("<Button-1>", self.on_mouse_click)
 
+        self.prefilled_cells = []
+
         self.mouse_x = None
         self.mouse_y = None
         self.selected_cell_row = None
         self.selected_cell_column = None
         self.cell_selected = False
         self.player_is_solving_puzzle = False
+        self.hints_left = 3
+        self.chances_left = 3
+        self.player_displayed_stats_ids = {}
 
         self.input_sudoku_matrix = None
 
@@ -66,10 +70,10 @@ class GUI:
         self.display_canvas()
         self.screen.mainloop()
 
-    def display_canvas(self, newly_filled_cell_row=None, newly_filled_cell_column=None):
+    def display_canvas(self):
         for object_id in self.sudoku_canvas_objects:
             self.canvas.delete(object_id)
-        self.display_sudoku(newly_filled_cell_row, newly_filled_cell_column)
+        self.display_sudoku()
 
     def display_buttons(self):
         # Create input sudoku, generate sudoku, get solution, solve for yourself buttons
@@ -110,11 +114,12 @@ class GUI:
         solve_for_yourself_button_y = 165
         solve_for_yourself_button_width = 43
         solve_for_yourself_button_height = 2
-        self.solve_for_yourself_button = tk.Button(self.screen, text="Solve For Yourself", font=("Helvetica", 12, "bold"),
-                                              width=solve_for_yourself_button_width,
-                                              height=solve_for_yourself_button_height,
-                                              activebackground="MediumOrchid3", background="peach puff",
-                                              borderwidth=2, command=self.solve_for_yourself_pressed)
+        self.solve_for_yourself_button = tk.Button(self.screen, text="Solve For Yourself",
+                                                   font=("Helvetica", 12, "bold"),
+                                                   width=solve_for_yourself_button_width,
+                                                   height=solve_for_yourself_button_height,
+                                                   activebackground="MediumOrchid3", background="peach puff",
+                                                   borderwidth=2, command=self.solve_for_yourself_pressed)
         solve_for_yourself_button_window = self.canvas.create_window(solve_for_yourself_button_x,
                                                                      solve_for_yourself_button_y,
                                                                      window=self.solve_for_yourself_button)
@@ -127,6 +132,37 @@ class GUI:
         self.canvas.create_rectangle(notes_container_x, notes_container_y, notes_container_x + notes_container_width,
                                      notes_container_y + notes_container_height,
                                      outline="black", width=2, fill="navajo white")
+
+        # player stats
+        hints_label_x = 730
+        hints_label_y = 240
+        hints_label = tk.Label(self.screen, text="Hints left:", font=("Helvetica", 15, "bold"),
+                               background="navajo white")
+        hints_label_window = self.canvas.create_window(hints_label_x, hints_label_y, state="hidden", window=hints_label)
+        self.player_displayed_stats_ids["hints_label_window"] = hints_label_window
+
+        hints_data_label_x = 800
+        hints_data_label_y = 240
+        hints_data_label = tk.Label(self.screen, text=str(self.hints_left), font=("Helvetica", 15, "bold"),
+                                    background="navajo white")
+        hints_data_label_window = self.canvas.create_window(hints_data_label_x, hints_data_label_y, state="hidden",
+                                                            window=hints_data_label)
+        self.player_displayed_stats_ids["hints_data_label_window"] = hints_data_label_window
+
+        chances_label_x = 745
+        chances_label_y = 280
+        chances_label = tk.Label(self.screen, text="Chances left:", font=("Helvetica", 15, "bold"),
+                                 background="navajo white")
+        chances_label_window = self.canvas.create_window(chances_label_x, chances_label_y, state="hidden", window=chances_label)
+        self.player_displayed_stats_ids["chances_label_window"] = chances_label_window
+
+        chances_data_label_x = 830
+        chances_data_label_y = 280
+        chances_data_label = tk.Label(self.screen, text=str(self.chances_left), font=("Helvetica", 15, "bold"),
+                                      background="navajo white")
+        chances_data_label_window = self.canvas.create_window(chances_data_label_x, chances_data_label_y, state="hidden",
+                                                              window=chances_data_label)
+        self.player_displayed_stats_ids["chances_data_label_window"] = chances_data_label_window
 
         back_button_x = 780
         back_button_y = 600
@@ -146,7 +182,7 @@ class GUI:
                                 activebackground="MediumOrchid3", background="lemon chiffon", borderwidth=2)
         next_button_window = self.canvas.create_window(next_button_x, next_button_y, window=next_button)
 
-    def display_sudoku(self, newly_filled_cell_row=None, newly_filled_cell_column=None):
+    def display_sudoku(self):
         # Create main Sudoku container
         container_x = 20
         container_y = 20
@@ -178,6 +214,50 @@ class GUI:
                 box_height = sub_container_height // 3
                 for m in range(3):
                     for n in range(3):
+                        if m == 0:
+                            if i == 0:
+                                row = 0
+                            elif i == 1:
+                                row = 3
+                            else:
+                                row = 6
+                        elif m == 1:
+                            if i == 0:
+                                row = 1
+                            elif i == 1:
+                                row = 4
+                            else:
+                                row = 7
+                        else:
+                            if i == 0:
+                                row = 2
+                            elif i == 1:
+                                row = 5
+                            else:
+                                row = 8
+
+                        if n == 0:
+                            if j == 0:
+                                column = 0
+                            elif j == 1:
+                                column = 3
+                            else:
+                                column = 6
+                        elif n == 1:
+                            if j == 0:
+                                column = 1
+                            elif j == 1:
+                                column = 4
+                            else:
+                                column = 7
+                        else:
+                            if j == 0:
+                                column = 2
+                            elif j == 1:
+                                column = 5
+                            else:
+                                column = 8
+
                         box_x = sub_container_x + n * box_width
                         box_y = sub_container_y + m * box_height
 
@@ -186,8 +266,8 @@ class GUI:
 
                         if self.player_is_solving_puzzle and self.mouse_x is not None and self.mouse_y is not None and box_x <= self.mouse_x <= next_box_x and box_y <= self.mouse_y <= next_box_y:
                             self.cell_selected = True
-                            self.selected_cell_row = m
-                            self.selected_cell_column = n
+                            self.selected_cell_row = row
+                            self.selected_cell_column = column
                             self.sudoku_canvas_objects.append(
                                 self.canvas.create_rectangle(box_x, box_y, box_x + box_width, box_y + box_height,
                                                              outline="black", width=1, fill="NavajoWhite2"))
@@ -199,7 +279,8 @@ class GUI:
                         if self.board is not None and subsquare[m][n] != 0:
                             text_x = box_x + box_width / 2
                             text_y = box_y + box_height / 2
-                            if m == newly_filled_cell_row and n == newly_filled_cell_column:
+
+                            if (row, column) not in self.prefilled_cells:
                                 self.sudoku_canvas_objects.append(
                                     self.canvas.create_text(text_x, text_y, text=str(subsquare[m][n]),
                                                             font=("Helvetica", 35, "bold"),
@@ -215,6 +296,8 @@ class GUI:
         self.board.fillValues()
         self.player_is_solving_puzzle = False
         self.solve_for_yourself_button.config(relief=RAISED)
+        self.save_prefilled_cells()
+        self.manage_player_stats("hide")
         self.display_canvas()
 
     def collect_inputs(self):
@@ -253,6 +336,8 @@ class GUI:
             input_window.destroy()
             self.board = Sudoku(self.N, self.K)
             self.board.mat = self.input_sudoku_matrix
+            self.save_prefilled_cells()
+            self.manage_player_stats("hide")
             self.display_canvas()
 
         # Create a button to submit the inputs and call the function
@@ -276,8 +361,28 @@ class GUI:
             if event.char.isdigit() and 1 <= int(event.char) <= 9:
                 print(self.selected_cell_row, self.selected_cell_column)
                 self.board.mat[self.selected_cell_row][self.selected_cell_column] = int(event.char)
-                self.display_canvas(self.selected_cell_row, self.selected_cell_column)
+                self.display_canvas()
+
+    def manage_player_stats(self, command):
+        if command == "show":
+            for _, value in self.player_displayed_stats_ids.items():
+                self.canvas.itemconfig(value, state="normal")
+        else:
+            for _, value in self.player_displayed_stats_ids.items():
+                self.canvas.itemconfig(value, state="hidden")
 
     def solve_for_yourself_pressed(self):
-        self.player_is_solving_puzzle = True
-        self.solve_for_yourself_button.config(relief=SUNKEN)
+        if self.board is not None:
+            self.hints_left = 3
+            self.chances_left = 3
+            self.player_is_solving_puzzle = True
+            self.solve_for_yourself_button.config(relief=SUNKEN)
+            self.manage_player_stats("show")
+
+    def save_prefilled_cells(self):
+        self.prefilled_cells.clear()
+        for i in range(9):
+            for j in range(9):
+                if self.board.mat[i][j] != 0:
+                    self.prefilled_cells.append((i, j))
+        print(self.prefilled_cells)
