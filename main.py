@@ -247,4 +247,4 @@ print(n)
 print(type(variables_domains[(3,3)]))
 
 print(type(sudoku.mat))
-gui = GUI(sudoku.mat)
+# gui = GUI(sudoku.mat)
