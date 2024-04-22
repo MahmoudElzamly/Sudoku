@@ -112,3 +112,4 @@ class Sudoku:  # Code from GeeksforGeeks
                 if self.mat[i][j] == 0:
                     count += 1
         return count
+

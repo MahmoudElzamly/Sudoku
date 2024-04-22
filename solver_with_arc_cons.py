@@ -1,23 +1,9 @@
-from time import sleep
-
-from gui import GUI
-import queue
-from random_sudoku_generator import Sudoku
-from solver_with_arc_cons import solve_sudoku
-from validator import isValidSudoku
 import copy
 
-N = 9
-K = 40
-sudoku = Sudoku(N, K)
-sudoku.fillValues()
+from random_sudoku_generator import Sudoku
 
 
-variables_domains = {}
-variables_arc_constraints = {}
-
-
-def initialize_variable_domains_and_constraints():
+def initialize_variable_domains_and_constraints(variables_domains, variables_arc_constraints, sudoku):
     for i in range(9):
         for j in range(9):
             if sudoku.mat[i][j] == 0:
@@ -219,10 +205,13 @@ def backtracking(variables_domains, variables_arc_constraints, sudoku_mat, solut
         print(sudoku_mat[i])
 
 
-# initialize_variable_domains_and_constraints()
-# n = arc_consistency(variables_domains, variables_arc_constraints, sudoku.mat)
-# # backtracking(variables_domains,variables_arc_constraints,sudoku.mat)
-# _, v = backtracking(variables_domains, variables_arc_constraints, sudoku.mat, [copy.deepcopy(sudoku.mat)])
-# print(len(v))
+def solve_sudoku(sudoku):
+    variables_domains = {}
+    variables_arc_constraints = {}
+    initialize_variable_domains_and_constraints(variables_domains, variables_arc_constraints, sudoku)
+    n = arc_consistency(variables_domains, variables_arc_constraints, sudoku.mat)
+    # backtracking(variables_domains,variables_arc_constraints,sudoku.mat)
+    _, v = backtracking(variables_domains, variables_arc_constraints, sudoku.mat, [copy.deepcopy(sudoku.mat)])
+    return v
 
-gui = GUI()
+
