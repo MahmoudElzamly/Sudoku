@@ -99,7 +99,7 @@ def arc_consistency(variables_domains, variables_arc_constraints, matrix):
                 value = variables_domains[(i, j)][0]
                 constr = variables_arc_constraints[(i, j)]
                 for k in constr:
-                    if value in variables_domains[k] and len(variables_domains[k])>1:
+                    if value in variables_domains[k] :
                         variables_domains[k].remove(value)
                         if len(variables_domains[k]) == 1:
                             check_oneElement_not_set.append((i, j))
@@ -176,12 +176,13 @@ def backtracking(variables_domains, variables_arc_constraints, sudoku_mat, solut
                 variables_domains = copy.deepcopy(dm)
                 variables_arc_constraints = copy.deepcopy(cst)
                 sudoku_mat = copy.deepcopy(mat)
-                k = vaules.pop(0)
-                variables_domains[(i, j)] = []
-                variables_domains[(i, j)].append(k)
+                # k = vaules.pop(0)
+                # p = []
+                # p.append(k)
+                # variables_domains.update({(MRV_Xind, MRV_Yind): p})
                 sol = copy.deepcopy(solution)
             else:
-                solution = v
+                # return sudoku_mat, sol
                 if is_complete(sudoku_mat):
                     return sudoku_mat, solution
 
