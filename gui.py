@@ -1,7 +1,7 @@
 import copy
 import tkinter as tk
 import random
-from tkinter import W, SUNKEN, RAISED
+from tkinter import W, SUNKEN, RAISED, messagebox
 from tkinter.simpledialog import askstring
 from random_sudoku_generator import Sudoku
 from solver_with_arc_cons import solve_sudoku, print_mat
@@ -45,7 +45,8 @@ def get_sudoku_input():
 class GUI:
     def __init__(self):
         self.N = 9
-        self.K = 40
+        self.K = 80
+        self.puzzle_difficulty = "Easy"
         self.board = None
         self.current_board_solutions = None
         self.user_solution = None
@@ -70,6 +71,7 @@ class GUI:
         self.game_over = False
         self.hints_left = 3
         self.chances_left = 3
+        self.puzzle_generation_ids = {}
         self.player_displayed_stats_ids = {}
         self.agent_displayed_stats_ids = {}
 
@@ -104,7 +106,7 @@ class GUI:
         generate_sudoku_button = tk.Button(self.screen, text="Generate Sudoku", font=("Helvetica", 12, "bold"),
                                            width=generate_sudoku_button_width, height=generate_sudoku_button_height,
                                            activebackground="MediumOrchid3", background="blanched almond",
-                                           borderwidth=2, command=self.generate_random_sudoku)
+                                           borderwidth=2, command=self.generate_random_sudoku_button_pressed)
         generate_sudoku_button_window = self.canvas.create_window(generate_sudoku_button_x, generate_sudoku_button_y,
                                                                   window=generate_sudoku_button)
 
@@ -142,6 +144,66 @@ class GUI:
                                      notes_container_y + notes_container_height,
                                      outline="black", width=2, fill="navajo white")
 
+        # puzzle generation objects
+        easy_button_x = 880
+        easy_button_y = 250
+        easy_button_width = 30
+        easy_button_height = 1
+        easy_button = tk.Button(self.screen, text="Easy", font=("Helvetica", 12, "bold"),
+                                width=easy_button_width, height=easy_button_height,
+                                activebackground="MediumOrchid3", background="blanched almond",
+                                borderwidth=2, command=self.easy_pressed)
+        easy_button_window = self.canvas.create_window(easy_button_x, easy_button_y,
+                                                       state="hidden",
+                                                       window=easy_button)
+        self.puzzle_generation_ids["easy_button_window"] = easy_button_window
+
+        medium_button_x = 880
+        medium_button_y = 300
+        medium_button_width = 30
+        medium_button_height = 1
+        medium_button = tk.Button(self.screen, text="Medium", font=("Helvetica", 12, "bold"),
+                                  width=medium_button_width, height=medium_button_height,
+                                  activebackground="MediumOrchid3", background="blanched almond",
+                                  borderwidth=2, command=self.medium_pressed)
+        medium_button_window = self.canvas.create_window(medium_button_x, medium_button_y, state="hidden",
+                                                         window=medium_button)
+        self.puzzle_generation_ids["medium_button_window"] = medium_button_window
+
+        hard_button_x = 880
+        hard_button_y = 350
+        hard_button_width = 30
+        hard_button_height = 1
+        hard_button = tk.Button(self.screen, text="Hard", font=("Helvetica", 12, "bold"),
+                                width=hard_button_width, height=hard_button_height,
+                                activebackground="MediumOrchid3", background="blanched almond",
+                                borderwidth=2, command=self.hard_pressed)
+        hard_button_window = self.canvas.create_window(hard_button_x, hard_button_y, state="hidden",
+                                                       window=hard_button)
+        self.puzzle_generation_ids["hard_button_window"] = hard_button_window
+
+        difficulty_label_x = 880
+        difficulty_label_y = 460
+        self.difficulty_label = tk.Label(self.screen, text=f"Chosen Difficulty: {self.puzzle_difficulty}",
+                                         font=("Helvetica", 15, "bold"),
+                                         background="navajo white")
+        difficulty_label_window = self.canvas.create_window(difficulty_label_x, difficulty_label_y,
+                                                            state="hidden",
+                                                            window=self.difficulty_label)
+        self.puzzle_generation_ids["difficulty_label_window"] = difficulty_label_window
+
+        generate_button_x = 885
+        generate_button_y = 610
+        generate_button_width = 40
+        generate_button_height = 2
+        generate_button = tk.Button(self.screen, text="Generate", font=("Helvetica", 12, "bold"),
+                                    width=generate_button_width, height=generate_button_height,
+                                    activebackground="MediumOrchid3", background="blanched almond",
+                                    borderwidth=2, command=self.generate_random_sudoku)
+        generate_button_window = self.canvas.create_window(generate_button_x, generate_button_y, state="hidden",
+                                                           window=generate_button)
+        self.puzzle_generation_ids["generate_button_window"] = generate_button_window
+
         # player stats
         hints_label_x = 730
         hints_label_y = 240
@@ -153,7 +215,7 @@ class GUI:
         hints_data_label_x = 800
         hints_data_label_y = 240
         self.hints_data_label = tk.Label(self.screen, text=str(self.hints_left), font=("Helvetica", 15, "bold"),
-                                    background="navajo white")
+                                         background="navajo white")
         hints_data_label_window = self.canvas.create_window(hints_data_label_x, hints_data_label_y, state="hidden",
                                                             window=self.hints_data_label)
         self.player_displayed_stats_ids["hints_data_label_window"] = hints_data_label_window
@@ -163,10 +225,11 @@ class GUI:
         get_hint_button_width = 8
         get_hint_button_height = 1
         get_hint_button = tk.Button(self.screen, text="Get Hint", font=("Helvetica", 12, "bold"),
-                                width=get_hint_button_width, height=get_hint_button_height,
-                                activebackground="MediumOrchid3", background="lemon chiffon", borderwidth=2,
-                                command=self.get_hint_pressed)
-        get_hint_button_window = self.canvas.create_window(get_hint_button_x, get_hint_button_y, state="hidden", window=get_hint_button)
+                                    width=get_hint_button_width, height=get_hint_button_height,
+                                    activebackground="MediumOrchid3", background="lemon chiffon", borderwidth=2,
+                                    command=self.get_hint_pressed)
+        get_hint_button_window = self.canvas.create_window(get_hint_button_x, get_hint_button_y, state="hidden",
+                                                           window=get_hint_button)
         self.player_displayed_stats_ids["get_hint_button_window"] = get_hint_button_window
 
         chances_label_x = 745
@@ -180,7 +243,7 @@ class GUI:
         chances_data_label_x = 830
         chances_data_label_y = 280
         self.chances_data_label = tk.Label(self.screen, text=str(self.chances_left), font=("Helvetica", 15, "bold"),
-                                      background="navajo white")
+                                           background="navajo white")
         chances_data_label_window = self.canvas.create_window(chances_data_label_x, chances_data_label_y,
                                                               state="hidden",
                                                               window=self.chances_data_label)
@@ -189,24 +252,21 @@ class GUI:
         game_over_label_x = 870
         game_over_label_y = 380
         game_over_label = tk.Label(self.screen, text="Game Over!!!", font=("Helvetica", 18, "bold"),
-                                           background="navajo white")
+                                   background="navajo white")
         game_over_label_window = self.canvas.create_window(game_over_label_x, game_over_label_y,
-                                                              state="hidden",
-                                                              window=game_over_label)
+                                                           state="hidden",
+                                                           window=game_over_label)
         self.player_displayed_stats_ids["game_over_label_window"] = game_over_label_window
 
-        state_label_x = 780
-        state_label_y = 600
-        state_label = tk.Label(self.screen, text="", font=("Helvetica", 15, "bold"), background="navajo white")
-        state_label_window = self.canvas.create_window(state_label_x, state_label_y, state="hidden", window=state_label)
-        self.agent_displayed_stats_ids["state_label_window"] = state_label_window
-
+        # Ai solver stats
         note_1_label_x = 870
         note_1_label_y = 240
-        note_1_label = tk.Label(self.screen, text="- Navigate through different steps of the\nsolution with the back and next buttons.", font=("Helvetica", 15, "bold"),
-                                    background="navajo white")
+        note_1_label = tk.Label(self.screen,
+                                text="- Navigate through different steps of the\nsolution with the back and next buttons.",
+                                font=("Helvetica", 15, "bold"),
+                                background="navajo white")
         note_1_label_window = self.canvas.create_window(note_1_label_x, note_1_label_y, state="hidden",
-                                                            window=note_1_label)
+                                                        window=note_1_label)
         self.agent_displayed_stats_ids["note_1_label_window"] = note_1_label_window
 
         note_2_label_x = 870
@@ -234,10 +294,11 @@ class GUI:
         beginning_button_width = 8
         beginning_button_height = 2
         beginning_button = tk.Button(self.screen, text="Beginning", font=("Helvetica", 12, "bold"),
-                                width=beginning_button_width, height=beginning_button_height,
-                                activebackground="MediumOrchid3", background="lemon chiffon", borderwidth=2,
-                                command=self.beginning_pressed)
-        beginning_button_window = self.canvas.create_window(beginning_button_x, beginning_button_y, state="hidden", window=beginning_button)
+                                     width=beginning_button_width, height=beginning_button_height,
+                                     activebackground="MediumOrchid3", background="lemon chiffon", borderwidth=2,
+                                     command=self.beginning_pressed)
+        beginning_button_window = self.canvas.create_window(beginning_button_x, beginning_button_y, state="hidden",
+                                                            window=beginning_button)
         self.agent_displayed_stats_ids["beginning_button_window"] = beginning_button_window
 
         back_button_x = 825
@@ -267,10 +328,11 @@ class GUI:
         final_solution_button_width = 10
         final_solution_button_height = 2
         final_solution_button = tk.Button(self.screen, text="Final Solution", font=("Helvetica", 12, "bold"),
-                                width=final_solution_button_width, height=final_solution_button_height,
-                                activebackground="MediumOrchid3", background="lemon chiffon", borderwidth=2,
-                                command=self.final_solution_pressed)
-        final_solution_button_window = self.canvas.create_window(final_solution_button_x, final_solution_button_y, state="hidden", window=final_solution_button)
+                                          width=final_solution_button_width, height=final_solution_button_height,
+                                          activebackground="MediumOrchid3", background="lemon chiffon", borderwidth=2,
+                                          command=self.final_solution_pressed)
+        final_solution_button_window = self.canvas.create_window(final_solution_button_x, final_solution_button_y,
+                                                                 state="hidden", window=final_solution_button)
         self.agent_displayed_stats_ids["final_solution_button_window"] = final_solution_button_window
 
     def display_sudoku(self, matrix):
@@ -388,7 +450,21 @@ class GUI:
                                                             font=("Helvetica", 35, "bold"),
                                                             fill="black"))
 
+    def generate_random_sudoku_button_pressed(self):
+
+        self.manage_puzzle_generation_stats("show")
+        self.manage_player_stats("hide")
+        self.manage_solution_stats("hide")
+
     def generate_random_sudoku(self):
+        if self.puzzle_difficulty == "Easy":
+            self.K = 38
+        elif self.puzzle_difficulty == "Medium":
+            self.K = 47
+        else:
+            self.K = 56
+
+        self.wrong_cells.clear()
         self.board = Sudoku(self.N, self.K)
         self.board.fillValues()
         self.player_is_solving_puzzle = False
@@ -405,9 +481,9 @@ class GUI:
         # Create a new top-level window for collecting inputs
         input_window = tk.Toplevel(self.screen)
         input_window.title("Input Sudoku Format")
-        input_window.geometry("300x250")
+        input_window.geometry("350x300")
 
-        # Initialize a list to store the questions and corresponding entries
+        # Initialize a list to store the prompts and corresponding entries
         prompts = ['row 1', 'row 2', 'row 3', 'row 4', 'row 5', 'row 6', 'row 7', 'row 8', 'row 9']
         entries = []
 
@@ -419,9 +495,11 @@ class GUI:
         for i, question in enumerate(prompts):
             label = tk.Label(frame, text=question)
             label.grid(row=i, column=0, sticky=W)
-            entry = tk.Entry(frame, width=30)
+            entry = tk.Entry(frame, width=40)
             entry.grid(row=i, column=1)
             entries.append(entry)
+        error_text = tk.Label(frame, text="")
+        error_text.grid(row=9, column=1)
 
         # Define a function to retrieve the inputs and show the result
         def save_input():
@@ -432,7 +510,11 @@ class GUI:
                 for char in row:
                     matrix_row.append(int(char))
                 self.input_sudoku_matrix.append(matrix_row)
-            input_window.destroy()
+            for i in range(9):
+                if len(self.input_sudoku_matrix[i]) < 9:
+                    error_text = tk.Label(frame, text="Error\nOne or more rows have less than 9 values.")
+                    error_text.grid(row=9, column=0, columnspan=2)
+                    return
             self.board = Sudoku(self.N, self.K)
             self.board.mat = self.input_sudoku_matrix
             self.save_prefilled_cells()
@@ -440,6 +522,7 @@ class GUI:
             self.solve_for_yourself_button.config(relief=RAISED)
             self.get_solution_button.config(relief=RAISED)
             self.current_board_solutions = None
+            self.manage_puzzle_generation_stats("hide")
             self.manage_player_stats("hide")
             self.manage_solution_stats("hide")
             self.display_canvas(self.board.mat)
@@ -460,14 +543,16 @@ class GUI:
             self.display_canvas(self.user_solution)
 
     def on_key_press(self, event):
-        #print(event.char)
+        # print(event.char)
         if not self.cell_selected or self.game_over:
             return
-        if self.user_solution[self.selected_cell_row][self.selected_cell_column] == 0 or (self.selected_cell_row, self.selected_cell_column) in self.wrong_cells:
+        if self.user_solution[self.selected_cell_row][self.selected_cell_column] == 0 or (
+                self.selected_cell_row, self.selected_cell_column) in self.wrong_cells:
             if event.char.isdigit() and 1 <= int(event.char) <= 9:
-                #print(self.selected_cell_row, self.selected_cell_column)
+                # print(self.selected_cell_row, self.selected_cell_column)
                 self.user_solution[self.selected_cell_row][self.selected_cell_column] = int(event.char)
-                if self.current_board_solutions[-1][self.selected_cell_row][self.selected_cell_column] == int(event.char):
+                if self.current_board_solutions[-1][self.selected_cell_row][self.selected_cell_column] == int(
+                        event.char):
                     if (self.selected_cell_row, self.selected_cell_column) in self.wrong_cells:
                         self.wrong_cells.remove((self.selected_cell_row, self.selected_cell_column))
                     self.display_canvas(self.user_solution)
@@ -491,6 +576,15 @@ class GUI:
         self.game_over = True
         self.canvas.itemconfig(self.player_displayed_stats_ids["game_over_label_window"], state="normal")
 
+    def manage_puzzle_generation_stats(self, command):
+        if command == "show":
+            for key, value in self.puzzle_generation_ids.items():
+                self.canvas.itemconfig(value, state="normal")
+
+        else:
+            for _, value in self.puzzle_generation_ids.items():
+                self.canvas.itemconfig(value, state="hidden")
+
     def manage_solution_stats(self, command):
         if command == "show":
             for key, value in self.agent_displayed_stats_ids.items():
@@ -509,9 +603,11 @@ class GUI:
                 self.canvas.itemconfig(value, state="hidden")
 
     def get_solution_pressed(self):
+        self.wrong_cells.clear()
         self.current_board_solutions = solve_sudoku(copy.deepcopy(self.board))
         print(self.current_board_solutions[-1])
         print(self.board.mat)
+        self.manage_puzzle_generation_stats("hide")
         self.manage_solution_stats("show")
         self.manage_player_stats("hide")
         self.get_solution_button.config(relief=SUNKEN)
@@ -524,6 +620,7 @@ class GUI:
         if self.board is not None:
             if self.current_board_solutions is None:
                 self.current_board_solutions = solve_sudoku(copy.deepcopy(self.board))
+            self.wrong_cells.clear()
             self.game_over = False
             self.hints_left = 3
             self.chances_left = 3
@@ -532,11 +629,24 @@ class GUI:
             self.player_is_solving_puzzle = True
             self.solve_for_yourself_button.config(relief=SUNKEN)
             self.get_solution_button.config(relief=RAISED)
+            self.manage_puzzle_generation_stats("hide")
             self.manage_player_stats("show")
             self.manage_solution_stats("hide")
             self.canvas.itemconfig(self.player_displayed_stats_ids["game_over_label_window"], state="hidden")
             self.user_solution = copy.deepcopy(self.board.mat)
             self.display_canvas(self.user_solution)
+
+    def easy_pressed(self):
+        self.puzzle_difficulty = "Easy"
+        self.difficulty_label.config(text=f"Chosen Difficulty: {self.puzzle_difficulty}")
+
+    def medium_pressed(self):
+        self.puzzle_difficulty = "Medium"
+        self.difficulty_label.config(text=f"Chosen Difficulty: {self.puzzle_difficulty}")
+
+    def hard_pressed(self):
+        self.puzzle_difficulty = "Hard"
+        self.difficulty_label.config(text=f"Chosen Difficulty: {self.puzzle_difficulty}")
 
     def back_pressed(self):
         if self.current_state > 1:
@@ -559,7 +669,8 @@ class GUI:
     def get_hint_pressed(self):
         row = self.selected_cell_row
         column = self.selected_cell_column
-        if not self.game_over and self.hints_left > 0 and self.cell_selected and (row, column) not in self.prefilled_cells and (
+        if not self.game_over and self.hints_left > 0 and self.cell_selected and (
+                row, column) not in self.prefilled_cells and (
                 self.user_solution[row][column] == 0 or (row, column) in self.wrong_cells):
             self.user_solution[row][column] = self.current_board_solutions[-1][row][column]
             if (row, column) in self.wrong_cells:
