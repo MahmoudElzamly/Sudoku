@@ -78,9 +78,9 @@ def generate_puzzle(difficulty):
 
     def remove_numbers(board, diff):
         # Determine the number of cells to remove based on difficulty
-        if diff == "E":
+        if diff == "Easy":
             removedCells = 38
-        elif diff == "M":
+        elif diff == "Medium":
             removedCells = 47
         else:
             removedCells = 56
