@@ -1,4 +1,5 @@
 import random
+import copy
 
 
 def is_valid_place(board, row, col, num):
@@ -24,13 +25,16 @@ def solver(board):
         if board[row][col] != 0:
             return backtrack(row, col + 1)
 
-        for num in range(1, 10):
+        numbers = list(range(1, 10))
+        random.shuffle(numbers)
+        for _ in range(9):
+            num = numbers.pop()
             if is_valid_place(board, row, col, num):
                 board[row][col] = num
                 solution = backtrack(row, col + 1)
                 if solution is not None:
                     return solution
-                board[row][col] = 0  #backtrack
+                board[row][col] = 0  # backtrack
 
         return None  #no solution
 
@@ -40,7 +44,7 @@ def solver(board):
 
 def is_solvable(board):
 
-    #check row and column constraints
+    # check row and column constraints
     for i in range(9):
         row_nums = set()
         col_nums = set()
@@ -51,7 +55,7 @@ def is_solvable(board):
                 row_nums.add(board[i][j])
                 col_nums.add(board[j][i])
 
-    #check subgrid constraints
+    # check subgrid constraints
     for i in range(0, 9, 3):
         for j in range(0, 9, 3):
             subgrid_nums = set()
@@ -64,38 +68,38 @@ def is_solvable(board):
     return True
 
 
-def generate_puzzle():
+def generate_puzzle(difficulty):
 
-    #generate a complete sudoku solution
+    # generate a complete sudoku solution
     def generate_solution():
         board = [[0 for _ in range(9)] for _ in range(9)]
         solver(board)
         return board
 
-    def remove_numbers(board, difficulty):
+    def remove_numbers(board, diff):
         # Determine the number of cells to remove based on difficulty
-        if difficulty == "easy":
-            removedCells = 30
-        elif difficulty == "medium":
-            removedCells = 40
+        if diff == "E":
+            removedCells = 38
+        elif diff == "M":
+            removedCells = 47
         else:
-            removedCells = 50
+            removedCells = 56
 
-        #randomly select cells to remove while ensuring the puzzle remains solvable
+        # randomly select cells to remove while ensuring the puzzle remains solvable
         for _ in range(removedCells):
             row, col = random.randint(0, 8), random.randint(0, 8)
             while board[row][col] == 0:
                 row, col = random.randint(0, 8), random.randint(0, 8)
-            removed_number = board[row][col]
+           # removed_number = board[row][col]
             board[row][col] = 0
-            #check if the puzzle remains solvable after removing the number
-            currentState = [row[:] for row in board]
-            if not is_solvable(currentState):
-                board[row][col] = removed_number  #restore the removed number
+            # check if the puzzle remains solvable after removing the number
+            #currentState = copy.deepcopy(board)
+            #if not is_solvable(currentState):
+             #   board[row][col] = removed_number  # restore the removed number
 
     solution = generate_solution()
     puzzle = [row[:] for row in solution]
-    remove_numbers(puzzle, "medium")
+    remove_numbers(puzzle, difficulty)  # pass the difficulty level
     return puzzle
 
 
@@ -106,7 +110,7 @@ def print_board(board):
 
 def test_solver():
 
-    puzz = generate_puzzle()
+    puzz = generate_puzzle("M")
     print("puzzle before solution:")
     print_board(puzz)
     solution1 = solver(puzz)
