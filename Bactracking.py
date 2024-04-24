@@ -72,7 +72,6 @@ def generate_puzzle():
         solver(board)
         return board
 
-    #remove numbers while keeping the puzzle solvable
     def remove_numbers(board, difficulty):
         # Determine the number of cells to remove based on difficulty
         if difficulty == "easy":
@@ -95,8 +94,8 @@ def generate_puzzle():
                 board[row][col] = removed_number  #restore the removed number
 
     solution = generate_solution()
-    puzzle = [row[:] for row in solution]  #create a copy of the solution as the puzzle
-    remove_numbers(puzzle, "medium")  #adjust difficulty as needed
+    puzzle = [row[:] for row in solution]
+    remove_numbers(puzzle, "medium")
     return puzzle
 
 
