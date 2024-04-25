@@ -119,6 +119,10 @@ def backtracking(variables_domains, variables_arc_constraints, sudoku_mat, solut
                 solution.append(copy.deepcopy(sudoku_mat))
                 arc_consistency(variables_domains, variables_arc_constraints, sudoku_mat)
                 modified = 1
+                if is_complete(sudoku_mat):
+                    return sudoku_mat, solution
+                else:
+                    return backtracking(variables_domains, variables_arc_constraints, sudoku_mat, solution)
     # arc_consistency(variables_domains, variables_arc_constraints, sudoku_mat)
 
     if modified == 0:
@@ -135,7 +139,7 @@ def backtracking(variables_domains, variables_arc_constraints, sudoku_mat, solut
         dm = copy.deepcopy(variables_domains)
         cst = copy.deepcopy(variables_arc_constraints)
         sol = copy.deepcopy(solution)
-        #print('Mrv', MRV_Xind, MRV_Yind)
+        print('Mrv_____________________', MRV_Xind, MRV_Yind)
         mat = copy.deepcopy(sudoku_mat)
         while len(vaules) != 0:
             k = vaules.pop()
@@ -150,17 +154,14 @@ def backtracking(variables_domains, variables_arc_constraints, sudoku_mat, solut
                 variables_domains = copy.deepcopy(dm)
                 variables_arc_constraints = copy.deepcopy(cst)
                 sudoku_mat = copy.deepcopy(mat)
-                if len(vaules) != 0:
-                    k = vaules.pop(0)
-                    variables_domains[(i, j)] = []
-                    variables_domains[(i, j)].append(k)
-                    sol = copy.deepcopy(solution)
-                else:
+                sol = copy.deepcopy(solution)
+                if len(vaules) == 0:
+
                     return sudoku_mat,False
             else:
                 solution = v
-                if is_complete(sudoku_mat):
-                    return sudoku_mat, solution
+                if is_complete(k):
+                    return k, solution
 
                     #print("tefgayhcdsjcsdmkc")
                     # backtracking(variables_domains, variables_arc_constraints, sudoku_mat)
@@ -173,7 +174,7 @@ def backtracking(variables_domains, variables_arc_constraints, sudoku_mat, solut
             for i in range(0, 9):
                 # pass
                 print(sudoku_mat[i])
-            # time.sleep(15)
+            # time.sleep(10)
             return backtracking(variables_domains, variables_arc_constraints, sudoku_mat, solution)
 
     # arc_consistency(variables_domains, variables_arc_constraints, sudoku_mat)
