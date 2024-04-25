@@ -3,6 +3,8 @@ import tkinter as tk
 import random
 from tkinter import W, SUNKEN, RAISED, messagebox
 from tkinter.simpledialog import askstring
+
+import Bactracking
 from random_sudoku_generator import Sudoku
 from solver import solve_sudoku, print_mat
 
@@ -457,16 +459,9 @@ class GUI:
         self.manage_solution_stats("hide")
 
     def generate_random_sudoku(self):
-        if self.puzzle_difficulty == "Easy":
-            self.K = 38
-        elif self.puzzle_difficulty == "Medium":
-            self.K = 47
-        else:
-            self.K = 56
-
         self.wrong_cells.clear()
         self.board = Sudoku(self.N, self.K)
-        self.board.fillValues()
+        self.board.mat = Bactracking.generate_puzzle(self.puzzle_difficulty)
         self.player_is_solving_puzzle = False
         self.solve_for_yourself_button.config(relief=RAISED)
         self.get_solution_button.config(relief=RAISED)
@@ -515,18 +510,25 @@ class GUI:
                     error_text = tk.Label(frame, text="Error\nOne or more rows have less than 9 values.")
                     error_text.grid(row=9, column=0, columnspan=2)
                     return
-            self.board = Sudoku(self.N, self.K)
-            self.board.mat = self.input_sudoku_matrix
-            self.save_prefilled_cells()
-            self.player_is_solving_puzzle = False
-            self.solve_for_yourself_button.config(relief=RAISED)
-            self.get_solution_button.config(relief=RAISED)
-            self.current_board_solutions = None
-            self.manage_puzzle_generation_stats("hide")
-            self.manage_player_stats("hide")
-            self.manage_solution_stats("hide")
-            self.display_canvas(self.board.mat)
-            self.current_state = 1
+            for i in range(9):
+                print(self.input_sudoku_matrix[i])
+            if Bactracking.solver(copy.deepcopy(self.input_sudoku_matrix)) is not None:
+                self.board = Sudoku(self.N, self.K)
+                self.board.mat = self.input_sudoku_matrix
+                self.save_prefilled_cells()
+                self.player_is_solving_puzzle = False
+                self.solve_for_yourself_button.config(relief=RAISED)
+                self.get_solution_button.config(relief=RAISED)
+                self.current_board_solutions = None
+                self.manage_puzzle_generation_stats("hide")
+                self.manage_player_stats("hide")
+                self.manage_solution_stats("hide")
+                self.display_canvas(self.board.mat)
+                self.current_state = 1
+            else:
+                error_text = tk.Label(frame, text="Error\nUnsolvable sudoku.")
+                error_text.grid(row=9, column=0, columnspan=2)
+                return
 
         # Create a button to submit the inputs and call the function
         submit_button = tk.Button(input_window, text="Save", command=save_input)
