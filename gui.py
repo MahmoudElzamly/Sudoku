@@ -4,7 +4,7 @@ import random
 from tkinter import W, SUNKEN, RAISED, messagebox
 from tkinter.simpledialog import askstring
 from random_sudoku_generator import Sudoku
-from solver_with_arc_cons import solve_sudoku, print_mat
+from solver import solve_sudoku, print_mat
 
 
 def get_subsquare(i, j, matrix):
