@@ -51,6 +51,7 @@ class GUI:
         self.puzzle_difficulty = "Easy"
         self.board = None
         self.current_board_solutions = None
+        self.current_solution_steps_domains = None
         self.user_solution = None
         self.current_state = 1
         self.screen = tk.Tk()
@@ -606,9 +607,7 @@ class GUI:
 
     def get_solution_pressed(self):
         self.wrong_cells.clear()
-        self.current_board_solutions = solve_sudoku(copy.deepcopy(self.board))
-        print(self.current_board_solutions[-1])
-        print(self.board.mat)
+        self.current_board_solutions, self.current_solution_steps_domains = solve_sudoku(copy.deepcopy(self.board))
         self.manage_puzzle_generation_stats("hide")
         self.manage_solution_stats("show")
         self.manage_player_stats("hide")
@@ -618,10 +617,16 @@ class GUI:
         self.current_state = 1
         self.display_canvas(self.current_board_solutions[self.current_state - 1])
 
+    def display_state_domains(self, index):
+        print(f"Domains at step {index + 1} out of {len(self.current_solution_steps_domains)}")
+        for key, value in self.current_solution_steps_domains[index].items():
+            print(f"{key}: {value}")
+        print("-------------------------------------------------------------------------------")
+
     def solve_for_yourself_pressed(self):
         if self.board is not None:
             if self.current_board_solutions is None:
-                self.current_board_solutions = solve_sudoku(copy.deepcopy(self.board))
+                self.current_board_solutions, _ = solve_sudoku(copy.deepcopy(self.board))
             self.wrong_cells.clear()
             self.game_over = False
             self.hints_left = 3
@@ -654,11 +659,13 @@ class GUI:
         if self.current_state > 1:
             self.current_state -= 1
             self.display_canvas(self.current_board_solutions[self.current_state - 1])
+            self.display_state_domains(self.current_state - 1)
 
     def next_pressed(self):
         if self.current_state < len(self.current_board_solutions):
             self.current_state += 1
             self.display_canvas(self.current_board_solutions[self.current_state - 1])
+            self.display_state_domains(self.current_state - 1)
 
     def beginning_pressed(self):
         self.current_state = 1

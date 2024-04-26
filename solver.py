@@ -111,7 +111,7 @@ def backtracking(variables_domains, variables_arc_constraints, sudoku_mat, solut
     modified = 0
     for i in range(0, 9):
         for j in range(0, 9):
-            print(i, j, '....', (variables_domains[(i, j)]), sudoku_mat[i][j])
+            #print(i, j, '....', (variables_domains[(i, j)]), sudoku_mat[i][j])
             if len(variables_domains[(i, j)]) == 0:
                 return sudoku_mat, False,Domains
             if len(variables_domains[(i, j)]) == 1 and sudoku_mat[i][j] == 0:
@@ -121,7 +121,7 @@ def backtracking(variables_domains, variables_arc_constraints, sudoku_mat, solut
                 Domains.append(variables_domains)
                 modified = 1
                 if is_complete(sudoku_mat):
-                    return sudoku_mat, solution,Domains
+                    return sudoku_mat, solution, Domains
                 else:
                     return backtracking(variables_domains, variables_arc_constraints, sudoku_mat, solution,Domains)
     # arc_consistency(variables_domains, variables_arc_constraints, sudoku_mat)
@@ -141,7 +141,7 @@ def backtracking(variables_domains, variables_arc_constraints, sudoku_mat, solut
         cst = copy.deepcopy(variables_arc_constraints)
         sol = copy.deepcopy(solution)
         Dom_stored=copy.deepcopy(Domains)
-        print('Mrv_____________________', MRV_Xind, MRV_Yind)
+        #print('Mrv_____________________', MRV_Xind, MRV_Yind)
         mat = copy.deepcopy(sudoku_mat)
         while len(vaules) != 0:
             k = vaules.pop()
@@ -210,10 +210,10 @@ def solve_sudoku(sudoku):
     initialize_variable_domains_and_constraints(variables_domains, variables_arc_constraints, sudoku)
     n = arc_consistency(variables_domains, variables_arc_constraints, sudoku.mat)
     # backtracking(variables_domains,variables_arc_constraints,sudoku.mat)
-    _, v,d = backtracking(variables_domains, variables_arc_constraints, sudoku.mat, [copy.deepcopy(sudoku.mat)],[copy.deepcopy(n)])
+    _, v, d = backtracking(variables_domains, variables_arc_constraints, sudoku.mat, [copy.deepcopy(sudoku.mat)],[copy.deepcopy(n)])
 
-    for i in range(0,len(d)):
-        print(i,d[i])
-    return v
+    # for i in range(0,len(d)):
+    #     print(i,d[i])
+    return v, d
 
 
