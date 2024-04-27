@@ -654,7 +654,37 @@ class GUI:
     def hard_pressed(self):
         self.puzzle_difficulty = "Hard"
         self.difficulty_label.config(text=f"Chosen Difficulty: {self.puzzle_difficulty}")
+    def print_removed_constraints(self,index):
+        # prev=index-1
+        flag=0
+        current=copy.deepcopy(self.current_board_solutions[index])
+        prev=copy.deepcopy(self.current_board_solutions[index-1])
+        indexI=0
+        indexJ=0
+        for i in range(0,9):
+            for j in range(0, 9):
+                if current[i][j]!=prev[i][j]:
+                    indexI=i
+                    indexJ=j
+                    flag=1
+                    break
+            if flag==1:
+                break
+        print("i,j------------------------",i," ",j)
+        value=current[indexI][indexJ]
+        last_domain = self.current_solution_steps_domains[index-1]
+        current_domain = self.current_solution_steps_domains[index]
+        # print(last_domain)
+        for i in range(0,9):
+            for j in range(0, 9):
+                if value in last_domain[(i,j)] and value not in current_domain[(i,j)]:
+                    print("value ",value ," removed from domain of (",i,",",j,") due to constraint with (",indexI,",",indexJ,")" )
 
+
+
+
+
+        pass
     def back_pressed(self):
         if self.current_state > 1:
             self.current_state -= 1
@@ -666,6 +696,10 @@ class GUI:
             self.current_state += 1
             self.display_canvas(self.current_board_solutions[self.current_state - 1])
             self.display_state_domains(self.current_state - 1)
+            if self.current_state>0:
+                self.print_removed_constraints(self.current_state - 1)
+
+
 
     def beginning_pressed(self):
         self.current_state = 1
