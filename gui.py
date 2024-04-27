@@ -1,5 +1,6 @@
 import copy
 import tkinter as tk
+import time
 import random
 from tkinter import W, SUNKEN, RAISED, messagebox
 from tkinter.simpledialog import askstring
@@ -621,7 +622,9 @@ class GUI:
     def get_solution_pressed(self):
         if self.board is not None:
             self.wrong_cells.clear()
+            start_time = time.time()
             self.current_board_solutions, self.current_solution_steps_domains = solve_sudoku(copy.deepcopy(self.board))
+            End_time = time.time()
             self.manage_puzzle_generation_stats("hide")
             self.manage_solution_stats("show")
             self.manage_player_stats("hide")
@@ -630,6 +633,8 @@ class GUI:
             self.solve_for_yourself_button.config(relief=RAISED)
             self.current_state = 1
             self.display_canvas(self.current_board_solutions[self.current_state - 1])
+            t = End_time - start_time
+            print("Time taken for solving sudoku:", t, "seconds")
 
     def display_state_domains(self, index):
         print(f"Domains at step {index + 1} out of {len(self.current_solution_steps_domains)}")
