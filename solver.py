@@ -2,13 +2,14 @@ import copy
 import time
 
 
+# Function to initialize variable domains and constraints
 def initialize_variable_domains_and_constraints(variables_domains, variables_arc_constraints, sudoku):
     for i in range(9):
         for j in range(9):
             if sudoku[i][j] == 0:
-                variables_domains[(i, j)] = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+                variables_domains[(i, j)] = [1, 2, 3, 4, 5, 6, 7, 8, 9] # If the cell is empty, all numbers are possible
             else:
-                variables_domains[(i, j)] = [sudoku[i][j]]
+                variables_domains[(i, j)] = [sudoku[i][j]] # If the cell is filled, only one number is possible
 
             variable_constraints = []
             # Setting row constraints
@@ -91,6 +92,7 @@ def initialize_variable_domains_and_constraints(variables_domains, variables_arc
             variables_arc_constraints[(i, j)] = variable_constraints
 
 
+# Function to enforce arc consistency
 def arc_consistency(variables_domains,variables_arc_constraints,matrix):
     check_oneElement_not_set=[]
     for i in range(0,9):
@@ -106,6 +108,7 @@ def arc_consistency(variables_domains,variables_arc_constraints,matrix):
     return variables_domains
 
 
+# Backtracking algorithm to solve Sudoku
 def backtracking(variables_domains, variables_arc_constraints, sudoku_mat, solution,Domains):
     modified = 0
     for i in range(0, 9):
