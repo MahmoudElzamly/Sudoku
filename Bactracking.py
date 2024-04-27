@@ -1,13 +1,16 @@
 import random
-import copy
 
 
+# Function to check if placing a number at a certain position is valid
 def is_valid_place(board, row, col, num):
+    # Check if the number already exists in the same row or column
     for i in range(9):
         if board[row][i] == num or board[i][col] == num:
             return False
+    # Check if the number already exists in the same row or column
     start_row = (row // 3) * 3
     start_col = (col // 3) * 3
+    # Check if the number already exists in the 3x3 subgrid
     for i in range(start_row, start_row + 3):
         for j in range(start_col, start_col + 3):
             if board[i][j] == num:
@@ -15,67 +18,49 @@ def is_valid_place(board, row, col, num):
     return True
 
 
+# Function to solve the Sudoku puzzle using backtracking
 def solver(board):
     def backtrack(row=0, col=0):
+        # If reached the end of the column, move to the next row
         if col == 9:
             row += 1
             col = 0
+        # If reached the end of the board, the puzzle is solved
             if row == 9:
-                return board  #solved
+                return board  # solved
+        # If the cell is already filled, move to the next cell
         if board[row][col] != 0:
             return backtrack(row, col + 1)
-
+        # Generate random numbers from 1 to 9
         numbers = list(range(1, 10))
         random.shuffle(numbers)
+        # Try each number
         for _ in range(9):
             num = numbers.pop()
+            # If the number is valid, fill the cell with the number and try to solve the rest of the puzzle
             if is_valid_place(board, row, col, num):
                 board[row][col] = num
                 solution = backtrack(row, col + 1)
                 if solution is not None:
                     return solution
+                # If no solution found with this number, backtrack by setting the cell to 0
                 board[row][col] = 0  # backtrack
 
-        return None  #no solution
+        return None  # no solution
 
     solution = backtrack()
     return solution
 
 
-def is_solvable(board):
-
-    # check row and column constraints
-    for i in range(9):
-        row_nums = set()
-        col_nums = set()
-        for j in range(9):
-            if board[i][j] != 0:
-                if board[i][j] in row_nums or board[j][i] in col_nums:
-                    return False
-                row_nums.add(board[i][j])
-                col_nums.add(board[j][i])
-
-    # check subgrid constraints
-    for i in range(0, 9, 3):
-        for j in range(0, 9, 3):
-            subgrid_nums = set()
-            for k in range(i, i + 3):
-                for l in range(j, j + 3):
-                    if board[k][l] != 0 and board[k][l] in subgrid_nums:
-                        return False
-                    subgrid_nums.add(board[k][l])
-
-    return True
-
-
+# Function to generate a Sudoku puzzle with specified difficulty level
 def generate_puzzle(difficulty):
-
     # generate a complete sudoku solution
     def generate_solution():
         board = [[0 for _ in range(9)] for _ in range(9)]
         solver(board)
         return board
 
+    # Function to remove numbers from the solution based on difficulty level
     def remove_numbers(board, diff):
         # Determine the number of cells to remove based on difficulty
         if diff == "Easy":
@@ -90,13 +75,9 @@ def generate_puzzle(difficulty):
             row, col = random.randint(0, 8), random.randint(0, 8)
             while board[row][col] == 0:
                 row, col = random.randint(0, 8), random.randint(0, 8)
-           # removed_number = board[row][col]
             board[row][col] = 0
-            # check if the puzzle remains solvable after removing the number
-            #currentState = copy.deepcopy(board)
-            #if not is_solvable(currentState):
-             #   board[row][col] = removed_number  # restore the removed number
 
+    # Calls
     solution = generate_solution()
     puzzle = [row[:] for row in solution]
     remove_numbers(puzzle, difficulty)  # pass the difficulty level
@@ -109,13 +90,22 @@ def print_board(board):
 
 
 def test_solver():
-
-    puzz = generate_puzzle("M")
+    puzz = [[2, 0, 0, 0, 9, 0, 0, 4, 5],
+            [0, 9, 0, 0, 5, 1, 8, 0, 2],
+            [7, 5, 0, 4, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 3, 0, 8],
+            [1, 0, 0, 3, 6, 7, 4, 0, 0],
+            [0, 7, 4, 8, 0, 0, 0, 0, 1],
+            [5, 3, 1, 2, 0, 6, 0, 0, 4],
+            [8, 2, 0, 9, 4, 5, 6, 0, 3],
+            [0, 4, 0, 0, 0, 8, 0, 0, 0]]
+    puzzle = generate_puzzle("M")
     print("puzzle before solution:")
     print_board(puzz)
-    solution1 = solver(puzz)
-    print("Solution 1:")
-    print_board(solution1)
+
+# solution1 = solver(puzz)
+# print("Solution 1:")
+# print_board(solution1)
 
 
 if __name__ == "__main__":
