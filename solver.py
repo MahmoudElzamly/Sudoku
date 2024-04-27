@@ -1,15 +1,14 @@
 import copy
 import time
-from random_sudoku_generator import Sudoku
 
 
 def initialize_variable_domains_and_constraints(variables_domains, variables_arc_constraints, sudoku):
     for i in range(9):
         for j in range(9):
-            if sudoku.mat[i][j] == 0:
+            if sudoku[i][j] == 0:
                 variables_domains[(i, j)] = [1, 2, 3, 4, 5, 6, 7, 8, 9]
             else:
-                variables_domains[(i, j)] = [sudoku.mat[i][j]]
+                variables_domains[(i, j)] = [sudoku[i][j]]
 
             variable_constraints = []
             # Setting row constraints
@@ -91,6 +90,7 @@ def initialize_variable_domains_and_constraints(variables_domains, variables_arc
                     m += 1
             variables_arc_constraints[(i, j)] = variable_constraints
 
+
 def arc_consistency(variables_domains,variables_arc_constraints,matrix):
     check_oneElement_not_set=[]
     for i in range(0,9):
@@ -103,9 +103,8 @@ def arc_consistency(variables_domains,variables_arc_constraints,matrix):
                         # variables_domains.update({k:})
                         variables_domains[k].remove(value)
 
-
-
     return variables_domains
+
 
 def backtracking(variables_domains, variables_arc_constraints, sudoku_mat, solution,Domains):
     modified = 0
@@ -189,6 +188,7 @@ def backtracking(variables_domains, variables_arc_constraints, sudoku_mat, solut
     # # print("possitioon")
     # return backtracking(variables_domains, variables_arc_constraints, sudoku_mat, solution)
 
+
 def is_complete(sudoku_mat):
     for i in range(0, 9):
         for j in range(0, 9):
@@ -203,14 +203,13 @@ def print_mat(mat):
     print("_____________________")
 
 
-
 def solve_sudoku(sudoku):
     variables_domains = {}
     variables_arc_constraints = {}
     initialize_variable_domains_and_constraints(variables_domains, variables_arc_constraints, sudoku)
-    n = arc_consistency(variables_domains, variables_arc_constraints, sudoku.mat)
+    n = arc_consistency(variables_domains, variables_arc_constraints, sudoku)
     # backtracking(variables_domains,variables_arc_constraints,sudoku.mat)
-    _, v, d = backtracking(variables_domains, variables_arc_constraints, sudoku.mat, [copy.deepcopy(sudoku.mat)],[copy.deepcopy(n)])
+    _, v, d = backtracking(variables_domains, variables_arc_constraints, sudoku, [copy.deepcopy(sudoku)],[copy.deepcopy(n)])
 
     # for i in range(0,len(d)):
     #     print(i,d[i])

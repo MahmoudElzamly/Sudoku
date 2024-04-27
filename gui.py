@@ -5,7 +5,6 @@ from tkinter import W, SUNKEN, RAISED, messagebox
 from tkinter.simpledialog import askstring
 
 import Bactracking
-from random_sudoku_generator import Sudoku
 from solver import solve_sudoku, print_mat
 
 
@@ -454,15 +453,15 @@ class GUI:
                                                             fill="black"))
 
     def generate_random_sudoku_button_pressed(self):
-
         self.manage_puzzle_generation_stats("show")
         self.manage_player_stats("hide")
         self.manage_solution_stats("hide")
+        self.get_solution_button.config(relief=RAISED)
+        self.solve_for_yourself_button.config(relief=RAISED)
 
     def generate_random_sudoku(self):
         self.wrong_cells.clear()
-        self.board = Sudoku(self.N, self.K)
-        self.board.mat = Bactracking.generate_puzzle(self.puzzle_difficulty)
+        self.board = Bactracking.generate_puzzle(self.puzzle_difficulty)
         self.player_is_solving_puzzle = False
         self.solve_for_yourself_button.config(relief=RAISED)
         self.get_solution_button.config(relief=RAISED)
@@ -470,10 +469,13 @@ class GUI:
         self.save_prefilled_cells()
         self.manage_player_stats("hide")
         self.manage_solution_stats("hide")
-        self.display_canvas(self.board.mat)
+        self.display_canvas(self.board)
         self.current_state = 1
 
     def collect_inputs(self):
+        self.get_solution_button.config(relief=RAISED)
+        self.solve_for_yourself_button.config(relief=RAISED)
+
         # Create a new top-level window for collecting inputs
         input_window = tk.Toplevel(self.screen)
         input_window.title("Input Sudoku Format")
@@ -514,8 +516,7 @@ class GUI:
             for i in range(9):
                 print(self.input_sudoku_matrix[i])
             if Bactracking.solver(copy.deepcopy(self.input_sudoku_matrix)) is not None:
-                self.board = Sudoku(self.N, self.K)
-                self.board.mat = self.input_sudoku_matrix
+                self.board = self.input_sudoku_matrix
                 self.save_prefilled_cells()
                 self.player_is_solving_puzzle = False
                 self.solve_for_yourself_button.config(relief=RAISED)
@@ -524,7 +525,7 @@ class GUI:
                 self.manage_puzzle_generation_stats("hide")
                 self.manage_player_stats("hide")
                 self.manage_solution_stats("hide")
-                self.display_canvas(self.board.mat)
+                self.display_canvas(self.board)
                 self.current_state = 1
             else:
                 error_text = tk.Label(frame, text="Error\nUnsolvable sudoku.")
@@ -640,7 +641,7 @@ class GUI:
             self.manage_player_stats("show")
             self.manage_solution_stats("hide")
             self.canvas.itemconfig(self.player_displayed_stats_ids["game_over_label_window"], state="hidden")
-            self.user_solution = copy.deepcopy(self.board.mat)
+            self.user_solution = copy.deepcopy(self.board)
             self.display_canvas(self.user_solution)
 
     def easy_pressed(self):
@@ -704,10 +705,12 @@ class GUI:
     def beginning_pressed(self):
         self.current_state = 1
         self.display_canvas(self.current_board_solutions[self.current_state - 1])
+        self.display_state_domains(self.current_state - 1)
 
     def final_solution_pressed(self):
         self.current_state = len(self.current_board_solutions)
         self.display_canvas(self.current_board_solutions[self.current_state - 1])
+        self.display_state_domains(self.current_state - 1)
 
     def get_hint_pressed(self):
         row = self.selected_cell_row
@@ -725,6 +728,6 @@ class GUI:
         self.prefilled_cells.clear()
         for i in range(9):
             for j in range(9):
-                if self.board.mat[i][j] != 0:
+                if self.board[i][j] != 0:
                     self.prefilled_cells.append((i, j))
         print(self.prefilled_cells)
