@@ -343,6 +343,9 @@ class GUI:
         container_y = 20
         container_width = 630
         container_height = 630
+
+        selected_cell_number = self.get_number_in_selected_cell(matrix, container_width, container_height, container_x, container_y)
+
         self.sudoku_canvas_objects.append(
             self.canvas.create_rectangle(container_x, container_y, container_x + container_width,
                                          container_y + container_height,
@@ -423,13 +426,23 @@ class GUI:
                             self.cell_selected = True
                             self.selected_cell_row = row
                             self.selected_cell_column = column
-                            self.sudoku_canvas_objects.append(
-                                self.canvas.create_rectangle(box_x, box_y, box_x + box_width, box_y + box_height,
-                                                             outline="black", width=1, fill="NavajoWhite2"))
+                            if matrix[row][column] == selected_cell_number and (row, column) not in self.wrong_cells:
+                                self.sudoku_canvas_objects.append(
+                                    self.canvas.create_rectangle(box_x, box_y, box_x + box_width, box_y + box_height,
+                                                                 outline="black", width=1, fill="cyan2"))
+                            else:
+                                self.sudoku_canvas_objects.append(
+                                    self.canvas.create_rectangle(box_x, box_y, box_x + box_width, box_y + box_height,
+                                                                 outline="black", width=1, fill="NavajoWhite2"))
                         else:
-                            self.sudoku_canvas_objects.append(
-                                self.canvas.create_rectangle(box_x, box_y, box_x + box_width, box_y + box_height,
-                                                             outline="black", width=1, fill="antique white"))
+                            if matrix is not None and matrix[row][column] == selected_cell_number and (row, column) not in self.wrong_cells:
+                                self.sudoku_canvas_objects.append(
+                                    self.canvas.create_rectangle(box_x, box_y, box_x + box_width, box_y + box_height,
+                                                                 outline="black", width=1, fill="cyan2"))
+                            else:
+                                self.sudoku_canvas_objects.append(
+                                    self.canvas.create_rectangle(box_x, box_y, box_x + box_width, box_y + box_height,
+                                                                 outline="black", width=1, fill="antique white"))
 
                         if self.board is not None and subsquare[m][n] != 0:
                             text_x = box_x + box_width / 2
@@ -440,7 +453,6 @@ class GUI:
                                     self.canvas.create_text(text_x, text_y, text=str(subsquare[m][n]),
                                                             font=("Helvetica", 35, "bold"),
                                                             fill="red"))
-
                             elif (row, column) not in self.prefilled_cells:
                                 self.sudoku_canvas_objects.append(
                                     self.canvas.create_text(text_x, text_y, text=str(subsquare[m][n]),
@@ -513,9 +525,9 @@ class GUI:
                     error_text = tk.Label(frame, text="Error\nOne or more rows have less than 9 values.")
                     error_text.grid(row=9, column=0, columnspan=2)
                     return
-            for i in range(9):
-                print(self.input_sudoku_matrix[i])
             if Bactracking.solver(copy.deepcopy(self.input_sudoku_matrix)) is not None:
+                error_text = tk.Label(frame, text="")
+                error_text.grid(row=9, column=0, columnspan=2)
                 self.board = self.input_sudoku_matrix
                 self.save_prefilled_cells()
                 self.player_is_solving_puzzle = False
@@ -607,16 +619,17 @@ class GUI:
                 self.canvas.itemconfig(value, state="hidden")
 
     def get_solution_pressed(self):
-        self.wrong_cells.clear()
-        self.current_board_solutions, self.current_solution_steps_domains = solve_sudoku(copy.deepcopy(self.board))
-        self.manage_puzzle_generation_stats("hide")
-        self.manage_solution_stats("show")
-        self.manage_player_stats("hide")
-        self.get_solution_button.config(relief=SUNKEN)
-        self.player_is_solving_puzzle = False
-        self.solve_for_yourself_button.config(relief=RAISED)
-        self.current_state = 1
-        self.display_canvas(self.current_board_solutions[self.current_state - 1])
+        if self.board is not None:
+            self.wrong_cells.clear()
+            self.current_board_solutions, self.current_solution_steps_domains = solve_sudoku(copy.deepcopy(self.board))
+            self.manage_puzzle_generation_stats("hide")
+            self.manage_solution_stats("show")
+            self.manage_player_stats("hide")
+            self.get_solution_button.config(relief=SUNKEN)
+            self.player_is_solving_puzzle = False
+            self.solve_for_yourself_button.config(relief=RAISED)
+            self.current_state = 1
+            self.display_canvas(self.current_board_solutions[self.current_state - 1])
 
     def display_state_domains(self, index):
         print(f"Domains at step {index + 1} out of {len(self.current_solution_steps_domains)}")
@@ -655,6 +668,7 @@ class GUI:
     def hard_pressed(self):
         self.puzzle_difficulty = "Hard"
         self.difficulty_label.config(text=f"Chosen Difficulty: {self.puzzle_difficulty}")
+
     def print_removed_constraints(self,index):
         # prev=index-1
         flag=0
@@ -681,11 +695,8 @@ class GUI:
                 if value in last_domain[(i,j)] and value not in current_domain[(i,j)]:
                     print("value ",value ," removed from domain of (",i,",",j,") due to constraint with (",indexI,",",indexJ,")" )
 
-
-
-
-
         pass
+
     def back_pressed(self):
         if self.current_state > 1:
             self.current_state -= 1
@@ -699,8 +710,6 @@ class GUI:
             self.display_state_domains(self.current_state - 1)
             if self.current_state>0:
                 self.print_removed_constraints(self.current_state - 1)
-
-
 
     def beginning_pressed(self):
         self.current_state = 1
@@ -731,3 +740,29 @@ class GUI:
                 if self.board[i][j] != 0:
                     self.prefilled_cells.append((i, j))
         print(self.prefilled_cells)
+
+    def get_number_in_selected_cell(self, matrix, container_width, container_height, beg_x, beg_y):
+        if (self.mouse_x is None and self.mouse_y is None) or matrix is None:
+            return None
+
+        box_width = container_width // 9
+        box_height = container_height // 9
+
+        first_x = beg_x
+        last_x = first_x + box_width
+        first_y = beg_y
+        last_y = first_y + box_height
+        for i in range(9):
+            for j in range(9):
+                if first_x <= self.mouse_x <= last_x and first_y <= self.mouse_y <= last_y and (i, j) not in self.wrong_cells:
+                    if matrix[i][j] != 0:
+                        return matrix[i][j]
+                    return None
+                first_x = last_x
+                last_x = first_x + box_width
+            first_x = beg_x
+            last_x = first_x + box_width
+            first_y = last_y
+            last_y = first_y + box_height
+
+        return None
