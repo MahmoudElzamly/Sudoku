@@ -100,8 +100,8 @@ def test_solver():
             [8, 2, 0, 9, 4, 5, 6, 0, 3],
             [0, 4, 0, 0, 0, 8, 0, 0, 0]]
     puzzle = generate_puzzle("M")
-    print("puzzle before solution:")
-    print_board(puzz)
+   # print("puzzle before solution:")
+    # print_board(puzz)
 
 # solution1 = solver(puzz)
 # print("Solution 1:")
