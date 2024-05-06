@@ -97,7 +97,7 @@ class GUI:
         input_sudoku_button_height = 2
         input_sudoku_button = tk.Button(self.screen, text="Input Sudoku", font=("Helvetica", 12, "bold"),
                                         width=input_sudoku_button_width, height=input_sudoku_button_height,
-                                        activebackground="MediumOrchid3", background="papaya whip",
+                                        activebackground="sandy brown", background="papaya whip",
                                         borderwidth=2, command=self.collect_inputs)
         input_sudoku_button_window = self.canvas.create_window(input_sudoku_button_x, input_sudoku_button_y,
                                                                window=input_sudoku_button)
@@ -108,7 +108,7 @@ class GUI:
         generate_sudoku_button_height = 2
         generate_sudoku_button = tk.Button(self.screen, text="Generate Sudoku", font=("Helvetica", 12, "bold"),
                                            width=generate_sudoku_button_width, height=generate_sudoku_button_height,
-                                           activebackground="MediumOrchid3", background="blanched almond",
+                                           activebackground="sandy brown", background="blanched almond",
                                            borderwidth=2, command=self.generate_random_sudoku_button_pressed)
         generate_sudoku_button_window = self.canvas.create_window(generate_sudoku_button_x, generate_sudoku_button_y,
                                                                   window=generate_sudoku_button)
@@ -119,7 +119,7 @@ class GUI:
         get_solution_button_height = 2
         self.get_solution_button = tk.Button(self.screen, text="Get Solution", font=("Helvetica", 12, "bold"),
                                              width=get_solution_button_width, height=get_solution_button_height,
-                                             activebackground="MediumOrchid3", background="bisque", borderwidth=2,
+                                             activebackground="sandy brown", background="bisque", borderwidth=2,
                                              command=self.get_solution_pressed)
         get_solution_button_window = self.canvas.create_window(get_solution_button_x, get_solution_button_y,
                                                                window=self.get_solution_button)
@@ -132,7 +132,7 @@ class GUI:
                                                    font=("Helvetica", 12, "bold"),
                                                    width=solve_for_yourself_button_width,
                                                    height=solve_for_yourself_button_height,
-                                                   activebackground="MediumOrchid3", background="peach puff",
+                                                   activebackground="sandy brown", background="peach puff",
                                                    borderwidth=2, command=self.solve_for_yourself_pressed)
         solve_for_yourself_button_window = self.canvas.create_window(solve_for_yourself_button_x,
                                                                      solve_for_yourself_button_y,
@@ -154,7 +154,7 @@ class GUI:
         easy_button_height = 1
         easy_button = tk.Button(self.screen, text="Easy", font=("Helvetica", 12, "bold"),
                                 width=easy_button_width, height=easy_button_height,
-                                activebackground="MediumOrchid3", background="blanched almond",
+                                activebackground="sandy brown", background="blanched almond",
                                 borderwidth=2, command=self.easy_pressed)
         easy_button_window = self.canvas.create_window(easy_button_x, easy_button_y,
                                                        state="hidden",
@@ -167,7 +167,7 @@ class GUI:
         medium_button_height = 1
         medium_button = tk.Button(self.screen, text="Medium", font=("Helvetica", 12, "bold"),
                                   width=medium_button_width, height=medium_button_height,
-                                  activebackground="MediumOrchid3", background="blanched almond",
+                                  activebackground="sandy brown", background="blanched almond",
                                   borderwidth=2, command=self.medium_pressed)
         medium_button_window = self.canvas.create_window(medium_button_x, medium_button_y, state="hidden",
                                                          window=medium_button)
@@ -179,7 +179,7 @@ class GUI:
         hard_button_height = 1
         hard_button = tk.Button(self.screen, text="Hard", font=("Helvetica", 12, "bold"),
                                 width=hard_button_width, height=hard_button_height,
-                                activebackground="MediumOrchid3", background="blanched almond",
+                                activebackground="sandy brown", background="blanched almond",
                                 borderwidth=2, command=self.hard_pressed)
         hard_button_window = self.canvas.create_window(hard_button_x, hard_button_y, state="hidden",
                                                        window=hard_button)
@@ -201,7 +201,7 @@ class GUI:
         generate_button_height = 2
         generate_button = tk.Button(self.screen, text="Generate", font=("Helvetica", 12, "bold"),
                                     width=generate_button_width, height=generate_button_height,
-                                    activebackground="MediumOrchid3", background="blanched almond",
+                                    activebackground="sandy brown", background="blanched almond",
                                     borderwidth=2, command=self.generate_random_sudoku)
         generate_button_window = self.canvas.create_window(generate_button_x, generate_button_y, state="hidden",
                                                            window=generate_button)
@@ -229,7 +229,7 @@ class GUI:
         get_hint_button_height = 1
         get_hint_button = tk.Button(self.screen, text="Get Hint", font=("Helvetica", 12, "bold"),
                                     width=get_hint_button_width, height=get_hint_button_height,
-                                    activebackground="MediumOrchid3", background="lemon chiffon", borderwidth=2,
+                                    activebackground="sandy brown", background="lemon chiffon", borderwidth=2,
                                     command=self.get_hint_pressed)
         get_hint_button_window = self.canvas.create_window(get_hint_button_x, get_hint_button_y, state="hidden",
                                                            window=get_hint_button)
@@ -298,7 +298,7 @@ class GUI:
         beginning_button_height = 2
         beginning_button = tk.Button(self.screen, text="Beginning", font=("Helvetica", 12, "bold"),
                                      width=beginning_button_width, height=beginning_button_height,
-                                     activebackground="MediumOrchid3", background="lemon chiffon", borderwidth=2,
+                                     activebackground="sandy brown", background="lemon chiffon", borderwidth=2,
                                      command=self.beginning_pressed)
         beginning_button_window = self.canvas.create_window(beginning_button_x, beginning_button_y, state="hidden",
                                                             window=beginning_button)
@@ -310,7 +310,7 @@ class GUI:
         back_button_height = 2
         back_button = tk.Button(self.screen, text="Back", font=("Helvetica", 12, "bold"),
                                 width=back_button_width, height=back_button_height,
-                                activebackground="MediumOrchid3", background="lemon chiffon", borderwidth=2,
+                                activebackground="sandy brown", background="lemon chiffon", borderwidth=2,
                                 command=self.back_pressed)
         back_button_window = self.canvas.create_window(back_button_x, back_button_y, state="hidden", window=back_button)
         self.agent_displayed_stats_ids["back_button_window"] = back_button_window
@@ -321,7 +321,7 @@ class GUI:
         next_button_height = 2
         next_button = tk.Button(self.screen, text="Next", font=("Helvetica", 12, "bold"),
                                 width=next_button_width, height=next_button_height,
-                                activebackground="MediumOrchid3", background="lemon chiffon", borderwidth=2,
+                                activebackground="sandy brown", background="lemon chiffon", borderwidth=2,
                                 command=self.next_pressed)
         next_button_window = self.canvas.create_window(next_button_x, next_button_y, state="hidden", window=next_button)
         self.agent_displayed_stats_ids["next_button_window"] = next_button_window
@@ -332,7 +332,7 @@ class GUI:
         final_solution_button_height = 2
         final_solution_button = tk.Button(self.screen, text="Final Solution", font=("Helvetica", 12, "bold"),
                                           width=final_solution_button_width, height=final_solution_button_height,
-                                          activebackground="MediumOrchid3", background="lemon chiffon", borderwidth=2,
+                                          activebackground="sandy brown", background="lemon chiffon", borderwidth=2,
                                           command=self.final_solution_pressed)
         final_solution_button_window = self.canvas.create_window(final_solution_button_x, final_solution_button_y,
                                                                  state="hidden", window=final_solution_button)
@@ -620,6 +620,11 @@ class GUI:
                 self.canvas.itemconfig(value, state="hidden")
 
     def get_solution_pressed(self):
+        self.mouse_x = None
+        self.mouse_y = None
+        self.selected_cell_row = None
+        self.selected_cell_column = None
+        self.cell_selected = False
         if self.board is not None:
             self.wrong_cells.clear()
             start_time = time.time()
